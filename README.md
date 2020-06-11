@@ -12,8 +12,6 @@ This file includes a function that's useful for creating matrices where the comb
   - **Dependencies**: `Rcpp` (for compilation)
   - **Notes**: The input matrix can be obtained by doing something like `table(v1,v2) %>% as.data.frame.array() %>% as.matrix()` (where `v1` and `v2` are vectors with equal length). There's probably a prettier way to force the cross tabulation into a matrix form, but this works well enough, and you can write a wrapper function for it if you want. Also, I would recommend casting the input vectors to be **factors** and making sure that they have the same levels, it helps with making sure the matrix has the same dimensions (so you don't have size `n` for the cols and size `n-1` for the rows because one value just didn't appear in the second vector). Lastly, the language is C++, so make sure to use `Rcpp::sourceCpp()`.
 
-**Usage**: `with(mydata, table(obs1, obs2)) %>% as.data.frame.array() %>% as.matrix %>% add_halves()` where `obs1` and `obs2` are (preferably) factor vectors of the observations you want to cross tabulate with equivalent levels.
-
 ## `scale_scores.R`
 This file includes functions to work with clinical data, specifically pre- and post-treatment test scores. As a result, it can of course also be used for any experiment including pre- and post- evaluations. The functions are used to scale post-values relative to the distribution of the baseline evaluations, so that you can see treatment outcome results. The benefit of these functions is that you don't have to do something like `mutate(test_a_post_z = (test_a_post_raw - mean(test_a_pre_raw))/sd(test_a_pre_raw))` manually for every pair of tests you have. You might think to do something like `mutate(across(contains("pre"), ~scale, .names="{col}_z"))` but this won't let you access the distribution of the pre-scores. You *could* do some wrangling with pivoting, grouping, mutating, regrouping, and repivoting, but this seems like a lot of logical hoops to go through when really all you want is "z-score this using the mean and sd of a corresponding column." I do this by mapping a scaling function to a vector of column names, which lets me modify the strings to access the pre-scores easily. Thanks to [akrun's answer on SO](https://stackoverflow.com/questions/49816669/how-to-use-map-from-purrr-with-dplyrmutate-to-create-multiple-new-columns-base) which served as a reference.
 ### `scale_scores(scores, pres=NULL)`
@@ -34,4 +32,14 @@ This file includes functions to work with clinical data, specifically pre- and p
   - **Dependencies**: `tidyverse`
   - **Notes**: This doesn't require post-tests to exist, as it doesn't reference them.
 
-**Usage**: For pre and post z scores: `mydata %>% scale_pre_scores() %>% scale_post_scores()` (the ordering doesn't matter). Use `scale_post_scores(mydata)` if you just want post scores, you don't have to use both at the same time.
+### `scale_all_scores(alldf)`
+  - **Args**: `alldf`, a dataframe with your scores, can have other columns
+  - **Out**: the same dataframe but with new columns for the pre z-scores (given by `{col}_z`)
+  - **Dependencies**: `tidyverse`
+  - **Notes**: This is just a wrapper for `mydata %>% scale_pre_scores() %>% scale_post_scores()`
+    
+### `scale_groups(alldf, groupings=NULL)`
+  - **Args**: `alldf`, a dataframe with your scores, can have other columns. `groupings`, vector of strings of the column names you want to group by. Might change it to `...` in the future. `alldf` can be a grouped data frame, in which case nothing should be passed to `groupings`, and if you provide any further groupings they will be ignored.
+  - **Out**: the same dataframe but with new columns for the pre z-scores (given by `{col}_z`) *but grouped by groupings*
+  - **Dependencies**: `tidyverse`
+  - **Notes**: Instead of using all of the observations when calculating scores, it will calculate scores based on groups. Eg if you have 20 patients, 10 control and 10 treatment, this will calculate the pre- and post- scores for the control group and treatment group separately, but both scores will be held in the same column. There's an example tibble at the end of the file you can use to look at the behavior. Note that `scale_groups(alldf)` will be equivalent to `scale_all_scores(alldf)` if `alldf` is not a grouped dataframe.
