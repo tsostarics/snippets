@@ -19,7 +19,7 @@ Thanks to [akrun's answer on SO](https://stackoverflow.com/questions/49816669/ho
 
 ### `scale_scores(scores, pres=NULL)`
   - **Args**: `scores`, a numeric vector of raw values; `pres`, a numeric vector, optional.
-  - **Out**: z-scores of `scores` using the distribution of `pres` if `pres` is specified. If `pres` is not specified, the distribution of `scores` will be used instead.
+  - **Out**: z-scores of `scores` using the pooled mean and standard deviation of `scores` and `pres`. If `pres` is not given then the result is equivalent to just z-scoring `scores` by itself.
   - **Dependencies**: `tidyverse`
   - **Notes**: Will **not** throw an error if there are missing values, `na.rm=TRUE` is used. `pres` doesn't *have* to be the same length as `scores`.
 
