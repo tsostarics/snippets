@@ -17,8 +17,8 @@ This file includes functions to work with clinical data, specifically pre- and p
 
 Thanks to [akrun's answer on SO](https://stackoverflow.com/questions/49816669/how-to-use-map-from-purrr-with-dplyrmutate-to-create-multiple-new-columns-base) and [James Owers' answer on SO](https://stackoverflow.com/questions/21208801/group-by-multiple-columns-in-dplyr-using-string-vector-input) for some tricks with the data.
 
-### `scale_scores(scores, pres=NULL)`
-  - **Args**: `scores`, a numeric vector of raw values; `pres`, a numeric vector, optional.
+### `scale_scores(scores, pres=NULL, pool=TRUE)`
+  - **Args**: `scores`, a numeric vector of raw values; `pres`, a numeric vector, optional; `pool` determines whether you want to use pooled mean and standard deviation or not.
   - **Out**: z-scores of `scores` using the pooled mean and standard deviation of `scores` and `pres`. If `pres` is not given then the result is equivalent to just z-scoring `scores` by itself.
   - **Dependencies**: `tidyverse`
   - **Notes**: Will **not** throw an error if there are missing values, `na.rm=TRUE` is used. `pres` doesn't *have* to be the same length as `scores`.
@@ -41,8 +41,8 @@ Thanks to [akrun's answer on SO](https://stackoverflow.com/questions/49816669/ho
   - **Dependencies**: `tidyverse`
   - **Notes**: This is just a wrapper for `mydata %>% scale_pre_scores() %>% scale_post_scores()`
     
-### `scale_groups(alldf, groupings=NULL)`
-  - **Args**: `alldf`, a dataframe with your scores, can have other columns. `groupings`, vector of strings of the column names you want to group by. Might change it to `...` in the future. `alldf` can be a grouped data frame, in which case nothing should be passed to `groupings`, and if you provide any further groupings they will be ignored.
+### `scale_groups(alldf, groupings=NULL, pool=T, pptcol="participant", post_pat="_post", pre_pat="_pre", raw_pat="_raw",raw_pat="_z", pool=TRUE)`
+  - **Args**: `alldf`, a dataframe with your scores, can have other columns. `groupings`, vector of strings of the column names you want to group by. Might change it to `...` in the future. `alldf` can be a grouped data frame, in which case nothing should be passed to `groupings`, and if you provide any further groupings they will be ignored. Pooled mean and standard deviation is set as the default in `pool`. Other args are for column name information.
   - **Out**: the same dataframe but with new columns for the pre z-scores (given by `{col}_z`) *but grouped by groupings*
-  - **Dependencies**: `tidyverse`
-  - **Notes**: Instead of using all of the observations when calculating scores, it will calculate scores based on groups. Eg if you have 20 patients, 10 control and 10 treatment, this will calculate the pre- and post- scores for the control group and treatment group separately, but both scores will be held in the same column. There's an example tibble at the end of the file you can use to look at the behavior. Note that `scale_groups(alldf)` will be equivalent to `scale_all_scores(alldf)` if `alldf` is not a grouped dataframe. Lastly, this function assumes that participants/patients/subjects are held in a column called `participant`; will likely make this more general in the future.
+  - **Dependencies**: `tidyverse`, `rlang` (for nonstandard evaluation)
+  - **Notes**: Instead of using all of the observations when calculating scores, it will calculate scores based on groups. Eg if you have 20 patients, 10 control and 10 treatment, this will calculate the pre- and post- scores for the control group and treatment group separately, but both scores will be held in the same column. There's an example tibble at the end of the file you can use to look at the behavior. Note that `scale_groups(alldf)` will be equivalent to `scale_all_scores(alldf)` if `alldf` is not a grouped dataframe. This function has default parameters for things like the column holding the participant identifiers, but you can pass different values to it depending on what your data looks like. Same with the post/pre designators, you can change them to whatever but make sure you're consistent across all of your columns!
