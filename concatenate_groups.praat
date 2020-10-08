@@ -38,10 +38,10 @@ endform
 
 # Double check directory to make sure it ends in a slash
 # Note: max and linux users might need to change \ to /
-if right(sound_directory$, 1) <> "\"
+if right$(sound_directory$, 1) <> "\"
 	sound_directory$ = sound_directory$ + "\"
 endif
-if right(out_directory$, 1) <> "\"
+if right$(out_directory$, 1) <> "\"
 	out_directory$ = out_directory$ + "\"
 endif
 
