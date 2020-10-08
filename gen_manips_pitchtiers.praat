@@ -14,13 +14,14 @@
 # 
 ##########################################
 
-outDir$ = "D:\Experiments\qp_exp_1\sound\"
-
+outDir$ = "C:\Users\tsost\Desktop\flat contours\"
+echo 'outDir$'
 strings = Create Strings as file list: "fileList", outDir$ + "*.wav"
 numberOfFiles = Get number of strings
 for ifile to numberOfFiles
 	selectObject: strings
 	filename$ = Get string: ifile
+	printline: filename$
 	Read from file: outDir$ + filename$
 
 	filename$ = left$(filename$, length(filename$)-4)
