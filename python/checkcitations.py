@@ -1,3 +1,8 @@
+# Use this script to check if you have citations that don't exist in your
+# .bib file or if there are entries in your .bib file that aren't cited
+# in the text. Provide path to .tex file as first command line argument,
+# path to .bib file as the second argument. 
+# EG: python checkcitations.py main.tex mybib.bib
 import re
 from collections import defaultdict
 import sys
@@ -22,12 +27,12 @@ if __name__ == "__main__":
     for line in f:
       line_count += 1
       
-      # Extract however many citations there are in the command, split on the ,
+      # Extract citation calls (\cite, \parencite, \textcite) from the line
       citation_args = cite_pat.findall(line)
       
-      if len(citation_args) != 0:
+      if len(citation_args) != 0: # If we found any citations
         for arg_tuple in citation_args:
-          citations = arg_tuple[1].split(",")
+          citations = arg_tuple[1].split(",") # Split up any multi citations
           for cite in citations:
             intext_citations[cite.strip()].append(line_count)
   
