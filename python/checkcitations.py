@@ -19,7 +19,7 @@ if __name__ == "__main__":
   
   bib_pat = re.compile(r"@[^{]+{([^,]+)")
   cite_pat = re.compile(r"\\(cite|parencite|textcite)\{([^}]+)\}")
-  badlabel_pat = re.compile(r"(\\label|\\ref)\{([^}_]*_[^}_]*)\}")
+  badlabel_pat = re.compile(r"(\\label|\\ref|\\includegraphics)(\[[^]]*\])?\{([^}_]*_[^}_]*)\}")
   bib_entries = defaultdict(int) # Map bib keys to bib file line
   intext_citations = defaultdict(list) # Map citation keys to tex file lines
   intext_bad_labels = defaultdict(list) # Map citation keys to tex file lines
@@ -41,7 +41,7 @@ if __name__ == "__main__":
       bad_labels = badlabel_pat.findall(line)
       if len(bad_labels) != 0: 
         for label_tuple in bad_labels:
-          bad_label = label_tuple[1]
+          bad_label = label_tuple[2]
           intext_bad_labels[bad_label].append(line_count)
       
   line_count = 0
