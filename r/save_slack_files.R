@@ -34,7 +34,7 @@ pages <- lapply(seq_len(num_pages),
                                         oldest = 0,
                                         inclusive = "true",
                                         show_files_hidden_by_limit = "true",
-                                        page= i))
+                                        page = i))
 
 # Get list of contents
 contents <- lapply(pages, \(x) content(x)$files)
@@ -123,7 +123,7 @@ save_files <- function(file_df,
 all_file_info |> 
   split(~name) |> 
   purrr::walk(.f = \(x) save_files(x,
-                                   directory = "prosdlab/slackfiles/",
+                                   directory = "slackfiles/",
                                    subdirectory = first(x[['name_normalized']]),
                                    limit_rate = 10L,
                                    test = FALSE))
