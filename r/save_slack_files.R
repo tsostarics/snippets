@@ -3,7 +3,7 @@ library(dplyr)      # Wrangling
 library(purrr)      # Wrangling
 library(lubridate)  # Datetime conversion
 
-# Save bot token here from https://api.slack.com/apps/A01M8F23G86/oauth?success=1
+# Save bot token here from https://api.slack.com/apps/
 # Make sure it has the correct scopes and that it's been added to each channel
 # To add: Channel>Dropdown Menu>Integrations>Add App
 tkn <- "" # Should start with xoxb
