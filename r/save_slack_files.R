@@ -43,18 +43,18 @@ contents <- lapply(pages, \(x) content(x)$files)
 extracted_files <- 
   purrr::map_dfr(contents, 
                  \(x) 
-                 map_dfr(x, 
-                         \(y) {
-                           data.frame(timestamp = 
-                                        strsplit(
-                                          as.character(
-                                            lubridate::as_datetime(
-                                              y$timestamp)),
-                                          " ")[[1L]][1L],
-                                      filename = y$name,
-                                      url_private = y$url_private,
-                                      id = first(y$channels))
-                         }
+                 purrr::map_dfr(x, 
+                                \(y) {
+                                  data.frame(timestamp = 
+                                               strsplit(
+                                                 as.character(
+                                                   lubridate::as_datetime(
+                                                     y$timestamp)),
+                                                 " ")[[1L]][1L],
+                                             filename = y$name,
+                                             url_private = y$url_private,
+                                             id = first(y$channels))
+                                }
                  )
   )
 
