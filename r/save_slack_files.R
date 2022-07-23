@@ -45,12 +45,14 @@ extracted_files <-
                  \(x) 
                  purrr::map_dfr(x, 
                                 \(y) {
-                                  data.frame(timestamp = 
-                                               strsplit(
-                                                 as.character(
-                                                   lubridate::as_datetime(
-                                                     y$timestamp)),
-                                                 " ")[[1L]][1L],
+                                  data.frame(timestamp =
+                                               gsub("[-]","_",
+                                                    strsplit(
+                                                      as.character(
+                                                        lubridate::as_datetime(
+                                                          y$timestamp)),
+                                                      " ")[[1L]][1L]
+                                               ),
                                              filename = y$name,
                                              url_private = y$url_private,
                                              id = first(y$channels))
