@@ -102,8 +102,8 @@ save_files <- function(file_df,
   if (test) 
     file_df <- head(file_df)
   
-  for (file_i in seq_len(nrow(all_file_info))) {
-    cur_file <- all_file_info[file_i,]
+  for (file_i in seq_len(nrow(file_df))) {
+    cur_file <- file_df[file_i,]
     
     # Make the directory for the file
     file_dir <- paste0(save_dir, cur_file$timestamp, "_", cur_file$filename)
