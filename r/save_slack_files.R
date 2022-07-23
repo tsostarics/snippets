@@ -27,13 +27,13 @@ channel_info <-
                   list(
                       slackr:::slackr_history(channel = name,
                                               token = tkn,
-                                              posted_from_time = created, 
+                                              posted_from_time = lubridate::as_datetime(1518636809-100000000), 
                                               paginate = FALSE,
                                               message_count = 1000L) # Should be big enough, change if needed
                   ),
                 # Filter so that we only get the rows with files in them
-                files = ifelse('attachments' %in% colnames(files[[1]]),
-                               list(filter(files[[1]], !is.na(attachments))),
+                files = ifelse('upload' %in% colnames(files[[1]]),
+                               list(filter(files[[1]], !is.na(upload))),
                                files)
   )
 
