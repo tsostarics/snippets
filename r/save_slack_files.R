@@ -21,19 +21,20 @@ channel_info <-
   dplyr::select(id, name, name_normalized, created) |>
   # Add # for API calls
   dplyr::mutate(name = paste0("#", name)) |>
-  dplyr::group_by(name) |> 
+  dplyr::group_by(name) |>
   # Get a dataframe of all the files
   dplyr::mutate(files = 
                   list(
-                    dplyr::filter(
                       slackr:::slackr_history(channel = name,
                                               token = tkn,
                                               posted_from_time = created, 
                                               paginate = FALSE,
-                                              message_count = 1000L), # Should be big enough, change if needed
-                      !is.na(upload) # Ensures we only get messages with files
-                    )
-                  )
+                                              message_count = 1000L) # Should be big enough, change if needed
+                  ),
+                # Filter so that we only get the rows with files in them
+                files = ifelse('attachments' %in% colnames(files[[1]]),
+                               list(filter(files[[1]], !is.na(attachments))),
+                               files)
   )
 
 
@@ -113,7 +114,8 @@ save_files <- function(directory = 'slackfiles/',
 # Download all files
 channel_info |>
   split(~name) |>
-  purrr::walk(.f = \(x) save_files(subdirectory = x[['name_normalized']],
+  purrr::walk(.f = \(x) save_files(directory = "prosdlab/slackfiles/",
+                                   subdirectory = x[['name_normalized']],
                                    file_dfs = x[['files']][[1L]][['files']],
                                    limit_rate = 15L,
                                    test = FALSE))
