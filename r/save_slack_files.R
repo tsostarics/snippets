@@ -69,7 +69,7 @@ all_file_info <- dplyr::left_join(extracted_files, channel_info, by = 'id')
 
 #' Save files from slack channels
 #'
-#' Given a list of file data frames in a channel, download each file one by one.
+#' Given a data frame of file info, download each file one by one.
 #' Because this will result in a lot of download requests, the delay between
 #' requests `limit_rate` should be set to at least 10 or 15. Randomness is also 
 #' added to this delay (Normal dist, mean 3 sd 1).
