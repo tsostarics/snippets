@@ -47,9 +47,9 @@
 
 form Extract Multiple Takes
 	comment Directory of input sound files and textgrids
-	text fromDir D:\OneDrive - Northwestern University\_FromNUBox\Research\Dissertation\Part1\Exp1\Recordings\01_Mono
+	text fromDir C:\
 	comment Directory of output sound files and textgrids
-	text outDir D:\OneDrive - Northwestern University\_FromNUBox\Research\Dissertation\Part1\Exp1\Recordings\02_PossibleRecordings
+	text outDir C:\
 endform
 
 # Define main procedure to use in loop later
