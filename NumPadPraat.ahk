@@ -12,6 +12,10 @@ $Numpad3::
     Send, {Ctrl down},.2{Ctrl up}3
     return
 
+$Numpad5::
+    send, {Tab}
+    return
+
 $Numpad0::
     Send, {Ctrl down}a{Ctrl up}
     return
