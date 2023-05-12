@@ -10,6 +10,7 @@
 # Tip: Click 'apply' instead of 'ok' in the form to avoid rerunning the script.
 #      Then you can quickly run the script on multiple textgrids.
 #
+# Author: Thomas Sostarics, 5/12/2023
 # Adapted from a script by Danielle Daidone 5/2/17, itself 
 # adapted from a script by Jose J. Atria 5/21/12
 # https://www.ddaidone.com/uploads/1/0/5/2/105292729/move_left_boundary_left_for_labeled_intervals___zero_cross.txt
