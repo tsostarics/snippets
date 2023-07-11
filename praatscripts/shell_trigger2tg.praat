@@ -16,10 +16,10 @@
 ################################################################################
 form Convert to Mono and set textgrid from triggers
 	comment Input stereo sound path and desired output directory
-	text soundFile ../00_Raw/c_a_230503_001.wav
+	text soundFile ../00_Raw/c_a_230530_005.wav
 	text outputDir ../01_Mono/
 	comment Input prompt text file and csv filepath containing lookup table
-	text textFile ../../recording_prompts/c_a_230503_001.txt
+	text textFile ../../recording_prompts/c_a_230530_005.txt
 	text csvFile ../../recording_prompts/answer_prompts_critical.csv
 	comment Enter column names to look up and retrieve
 	text searchColName answer
@@ -76,6 +76,10 @@ endif
 procedure get_file_pattern: .searchString$
 	selectObject: lookupTable
 	rowNumber = Search column: searchColName$, .searchString$
+	appendInfoLine: rowNumber
+	appendInfoLine: retrieveColName$
+	appendInfoLine: .searchString$
+	appendInfoLine: searchColName$
 	.filePattern$ = Get value: rowNumber, retrieveColName$
 	.filePattern$  = .filePattern$ + sessionDate$
 endproc
@@ -110,7 +114,7 @@ Remove
 #get threshold for triggers
 selectObject: sound2
 maxAmplitude = Get maximum: 0, 0, "Sinc70"
-minAmplitude = Get maximum: 0, 0, "Sinc70"
+minAmplitude = Get minimum: 0, 0, "Sinc70"
 
 # If the trigger wave is inverted, then the peak will actually be
 # a valley, so we need to flip the whole trigger channel.
@@ -128,13 +132,23 @@ n = 0
 while n <= endTime
 	selectObject: sound2
 	amplitude = Get value at time: 1, n, "Sinc70"
-	if amplitude >= threshold
+	amplitudeSearch = Get maximum: n, n + jumpAheadWindow, "Sinc70"
+	if amplitudeSearch >= threshold
+		peakTime = Get time of maximum: n, n + jumpAheadWindow + delta, "Sinc70"
 		selectObject: tg
-		Insert boundary: 1, n
-		n = n + jumpAheadWindow
+		Insert boundary: 1, peakTime
+		n = n + jumpAheadWindow + delta * 2
+		appendInfoLine: peakTime
 	else
-		n = n + delta
+		n = n + jumpAheadWindow
 	endif
+#	if amplitude >= threshold
+#		selectObject: tg
+#		Insert boundary: 1, n
+#		n = n + jumpAheadWindow
+#	else
+#		n = n + delta
+#	endif
 endwhile
 
 selectObject: tg

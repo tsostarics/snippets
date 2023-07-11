@@ -1,8 +1,6 @@
 ##########################################
 #
 # Generate Manipulations and Pitch Tiers
-# Thomas Sostarics 2/11/2021
-# Last updated: 7/29/22
 #
 # Creates manipulations and pitch tier
 # objects for each wav file in a directory
@@ -16,26 +14,22 @@
 
 form Generate Manipulations and Pitch Tiers
 	comment Directory of sound files
-	text fromDir C:\
+	text fromDir ..\02_PossibleRecordings
 	comment Directory to save PitchTiers and Manipulations
-	text outDir C:\
+	text outDir ..\02_PossibleRecordings\PitchTiers
 	comment Should Manipulation files be saved? (0=No, 1=Yes)
 	integer saveManipulations 0
-	comment Should PitchTier files be saved? (0=No, 1=Yes)
+	comment Should PitchTier and IntensityTier files be saved? (0=No, 1=Yes)
 	integer savePitchTiers 1
+	integer saveIntensityTiers 1
 	comment Please enter the pitch range for the manipulation
-	natural min 45
-	natural max 250
+	natural min 40
+	natural max 200
 endform
 
-# Double check directory to make sure it ends in a slash
-# Note: max and linux users might need to change \ to /
-if right$(fromDir$, 1) <> "\"
-	fromDir$ = fromDir$ + "\"
-endif
-if right$(outDir$, 1) <> "\"
-	outDir$ = outDir$ + "\"
-endif
+# Clean directories
+fromDir$ = fromDir$ + "/"
+outDir$ = outDir$ + "/"
 
 Create Strings as file list: "list", fromDir$ + "*.wav"
 numberOfFiles = Get number of strings
@@ -43,7 +37,7 @@ numberOfFiles = Get number of strings
 for ifile to numberOfFiles
 	select Strings list
 	filename$ = Get string: ifile
-	echo blah
+	
 	Read from file: fromDir$ + filename$
 	filename$ = left$(filename$, length(filename$)-4)
 
@@ -52,6 +46,16 @@ for ifile to numberOfFiles
 	# the objects pane
 	objname$ = replace$(filename$, " ", "_", 0)
 
+	if saveIntensityTiers = 1
+		selectObject: "Sound " + objname$
+		To Intensity: min, 0, "no"
+		Down to IntensityTier
+		Save as text file: outDir$ + filename$ + ".IntensityTier"
+		selectObject: "Intensity " + objname$
+		plusObject: "IntensityTier " + objname$
+		Remove
+	endif
+	
 	selectObject: "Sound " + objname$
 	To Manipulation: 0.01, min, max
 
@@ -61,7 +65,6 @@ for ifile to numberOfFiles
 	endif
 
 	if savePitchTiers = 1
-		writeInfoLine: "blah"
 		selectObject: "Manipulation " + objname$
 		Extract pitch tier
 		Save as text file: outDir$ + filename$ + ".PitchTier"
@@ -69,6 +72,7 @@ for ifile to numberOfFiles
 		Remove
 	endif
 	selectObject: "Manipulation " + objname$
+	plusObject: "Sound " + objname$
 	Remove
 endfor
 
