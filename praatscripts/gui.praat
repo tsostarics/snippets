@@ -18,8 +18,7 @@
 # This script was written for a particular workflow in mind (tone annotation)
 # but can be modified as needed.
 ################################################################################
-# created: idk 6/8/2023
-# modified: 6/22/2023
+
 form Quick Annotate Files
 	comment Directory of input sound files
 	text inSoundDir ../02_PossibleRecordings
