@@ -1,6 +1,8 @@
 ###################################################################
 # Extract multiple takes from long recording
-# Thomas Sostarics 28 July 2022
+# Author: Thomas Sostarics
+# Date created: 28 July 2022
+# Last updated: 5 March 2025
 #
 # This script assumes an audio file with an 
 # associated textgrid with three interval tiers:
@@ -42,15 +44,25 @@
 #   137 if you want to remove or customize this behavior
 # - This script was made with the intention of feeding the output
 #   files and textgrids to the montreal forced aligner
-#
+# - 
 ###################################################################
 
 form Extract Multiple Takes
 	comment Directory of input sound files and textgrids
-	text fromDir C:\
+	text fromDir ../01_Mono
 	comment Directory of output sound files and textgrids
-	text outDir C:\
+	text outDir ../02_ExtractedRecordings
+	comment Prefix to add (will add _ separator, leave blank to not add)
+	text prefix 
+	comment Process files matching this regex (write *.wav to process all files in directory)
+	text filePattern *_f_*.wav
+	comment Number of characters to trim from text end (0=no change)
+	integer trimAmount 4
 endform
+
+if prefix$ <> ""
+	prefix$ = prefix$ + "_"
+endif
 
 # Define main procedure to use in loop later
 procedure extract_and_name_takes: .groupInterval, transcription$
@@ -59,7 +71,7 @@ procedure extract_and_name_takes: .groupInterval, transcription$
 	.groupEnd = Get end time of interval: 1, .groupInterval
 	groupFileName$ = Get label of interval: 3, .groupInterval
 	i = 1
-
+	
 	# Extract the group audio and textgrid region
 	selectObject: "Sound " + objname$
 	Extract part: .groupStart, .groupEnd, "rectangular", 1, "no"
@@ -90,11 +102,23 @@ procedure extract_and_name_takes: .groupInterval, transcription$
 			selectObject: "TextGrid " + objname$ + "_part" + "_part"
 			Remove tier: 2
 			Remove tier: 3
+			
+			# Trim from the right if needed; >0 to also ignore negative values
+			if trimAmount > 0
+				selectObject: "TextGrid " + objname$ + "_part_part"
+				tgLabel$ = Get label of interval: 1, 1
+				Set interval text: 1, 1, left$(tgLabel$, length(tgLabel$)-trimAmount)
+			endif
 
 
 			# Add take index with padded zeros, construct file name
 			take_i$ = right$("000" + string$(i), 3)
-			filename$ = outDir$ + groupFileName$ + "_" + tune$ + "_" + take_i$
+			if prefix$ <> ""
+				filename$ = outDir$ + prefix$ + groupFileName$ + "_" + take_i$
+			else
+				filename$ = outDir$ + groupFileName$ + "_" + take_i$
+			endif
+			
 			i = i + 1
 
 			# Save take as a new file, then remove take objects
@@ -117,14 +141,10 @@ endproc
 
 # Double check directory to make sure it ends in a slash
 # Note: max and linux users might need to change \ to /
-if right$(fromDir$, 1) <> "\"
-	fromDir$ = fromDir$ + "\"
-endif
-if right$(outDir$, 1) <> "\"
-	outDir$ = outDir$ + "\"
-endif
+fromDir$ = fromDir$ + "/"
+outDir$ = outDir$ + "/"
 
-Create Strings as file list: "list", fromDir$ + "*.wav"
+Create Strings as file list: "list", fromDir$ + filePattern$
 numberOfFiles = Get number of strings
 
 for ifile to numberOfFiles
@@ -132,11 +152,11 @@ for ifile to numberOfFiles
 	select Strings list
 	filename$ = Get string: ifile
 	Read from file: fromDir$ + filename$
-
+	
 	# Get the object name by chopping off the file extension,
 	# Get the tune by taking the last section of the name (eg exp1_raw_HLL -> HLL)
 	objname$ = left$(filename$, length(filename$)-4)
-	tune$ = right$(objname$, length(objname$) - rindex(objname$, "_"))
+	#tune$ = right$(objname$, length(objname$) - (rindex(objname$, "_"))+3)
 
 	Read from file: fromDir$ + objname$ + ".TextGrid"
 
